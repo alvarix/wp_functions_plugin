@@ -10,6 +10,50 @@
  */
 
 
+ // function sc_get_posts( $category_slug, $tag_slug, $post_type ) {
+ function sc_get_posts( $post_type ) {
+    $args = array(
+        'post_type' => $post_type,
+        'posts_per_page' => -1,
+        /*
+        'tax_query' => array(
+            'relation' => 'AND',
+            array(
+                'taxonomy' => 'category',
+                'field'    => 'slug',
+                'terms'    => $category_slug,
+            ),
+            array(
+                'taxonomy' => 'post_tag',
+                'field'    => 'slug',
+                'terms'    => $tag_slug,
+            ),
+        ),
+        */
+    );
+    $query = new WP_Query($args);
+
+    if ($query->have_posts()) {
+        return $query;
+    } else {
+        return false;
+    }
+}
+
+
+
+function sc_get_post_terms( $post_id, $tax ) {
+    $term_list = wp_get_post_terms($post_id, $tax);
+    $out_list = '';
+
+    if (!empty($term_list) && !is_wp_error($term_list)) {
+        foreach ($term_list as $term) {
+            $out_lis .= "<li>$term->name </li>";
+        }
+    } 
+
+    return $out_lis;
+}
 
 
 
