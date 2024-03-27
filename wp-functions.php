@@ -10,6 +10,29 @@
  */
 
 
+# ========================================================
+# = Basics
+# ========================================================
+// require_once( get_stylesheet_directory() . '/taxonomies/topic-area.php');
+// require_once( get_stylesheet_directory() . '/post-types/staff-member.php' );
+
+/**
+ * Register/enqueue custom scripts and styles
+ */
+add_action( 'wp_enqueue_scripts', function() {
+	// Enqueue your files on the canvas & frontend, not the builder panel. Otherwise custom CSS might affect builder)
+  wp_enqueue_script( 'jquery' );
+
+  wp_enqueue_script( 'bricks-child', get_stylesheet_directory_uri() . '/common.js', [], filemtime( get_stylesheet_directory() . '/common.js' ), true );
+	if ( ! bricks_is_builder_main() ) {
+		wp_enqueue_style( 'bricks-child', get_stylesheet_uri(), ['bricks-frontend'], filemtime( get_stylesheet_directory() . '/style.css' ) );
+		wp_enqueue_style( 'bricks-child-responsive', get_stylesheet_directory_uri().'/responsive.css', ['bricks-frontend'], filemtime( get_stylesheet_directory() . '/responsive.css' ) );
+	}
+} );
+
+# ========================================================
+# = Query
+# ========================================================
  // function sc_get_posts( $category_slug, $tag_slug, $post_type ) {
  function sc_get_posts( $post_type ) {
     $args = array(
@@ -94,7 +117,9 @@ function sc_get_post_terms( $post_id, $tax ) {
   return $output;
 }
 
-
+# ========================================================
+# = Search
+# ========================================================
 /*
 The following 3 filters are to add ACFs to search from
 https://adambalee.com/search-wordpress-by-custom-fields-without-a-plugin/
@@ -113,7 +138,7 @@ function cf_search_join( $join ) {
     }
     return $join;
 }
-add_filter('posts_join', 'cf_search_join' );
+//add_filter('posts_join', 'cf_search_join' );
 
 /**
  * Modify the search query with posts_where
@@ -129,7 +154,7 @@ function cf_search_where( $where ) {
     }
     return $where;
 }
-add_filter( 'posts_where', 'cf_search_where' );
+//add_filter( 'posts_where', 'cf_search_where' );
 
 /**
  * Prevent duplicates
@@ -143,13 +168,15 @@ function cf_search_distinct( $where ) {
     }
     return $where;
 }
-add_filter( 'posts_distinct', 'cf_search_distinct' );
+//add_filter( 'posts_distinct', 'cf_search_distinct' );
 
 
 
 
 
-
+# ========================================================
+# = Utils
+# ========================================================
 
 
 // display hierarchical post tax
@@ -190,8 +217,9 @@ function assign_parent_terms($post_id, $post){
 //add_action('save_post', 'assign_parent_terms', 10, 2);
 
 
-
-function sc_custom_javascript() { ?>
+// including JS 
+// this one adds a class to external links
+function custom_javascript() { ?>
     <script>
 
     (function($) {
@@ -204,21 +232,15 @@ function sc_custom_javascript() { ?>
     </script>
 <?php
 }
-//add_action('wp_head', 'sc_custom_javascript');
+//add_action('wp_head', 'custom_javascript');
 
-
-// include CPTs and Tax
-// require_once( get_stylesheet_directory() . '/taxonomies/topic-area.php');
-// require_once( get_stylesheet_directory() . '/post-types/staff-member.php' );
 
 
 // remove default Posts link in wp-admin menu
-/*
 function post_remove () { 
    remove_menu_page('edit.php');
 } 
-add_action('admin_menu', 'post_remove');
-*/
+// add_action('admin_menu', 'post_remove');
 
 
 // block WP enum scans
@@ -235,51 +257,4 @@ function shapeSpace_check_enum($redirect, $request) {
 	else return $redirect;
 }
 
-
-
-
-/**
- * Register/enqueue custom scripts and styles
- */
-add_action( 'wp_enqueue_scripts', function() {
-	// Enqueue your files on the canvas & frontend, not the builder panel. Otherwise custom CSS might affect builder)
-  wp_enqueue_script( 'jquery' );
-
-  wp_enqueue_script( 'bricks-child', get_stylesheet_directory_uri() . '/common.js', [], filemtime( get_stylesheet_directory() . '/common.js' ), true );
-	if ( ! bricks_is_builder_main() ) {
-		wp_enqueue_style( 'bricks-child', get_stylesheet_uri(), ['bricks-frontend'], filemtime( get_stylesheet_directory() . '/style.css' ) );
-		wp_enqueue_style( 'bricks-child-responsive', get_stylesheet_directory_uri().'/responsive.css', ['bricks-frontend'], filemtime( get_stylesheet_directory() . '/responsive.css' ) );
-	}
-} );
-
-
-
-/**
- *
- * Bricks
- *
- */
-
-/**
- * Register custom elements
- */
-add_action( 'init', function() {
-  $element_files = [
-    __DIR__ . '/elements/title.php',
-  ];
-
-  foreach ( $element_files as $file ) {
-    \Bricks\Elements::register_element( $file );
-  }
-}, 11 );
-
-/**
- * Add text strings to builder
- */
-add_filter( 'bricks/builder/i18n', function( $i18n ) {
-  // For element category 'custom'
-  $i18n['custom'] = esc_html__( 'Custom', 'bricks' );
-
-  return $i18n;
-} );
 
