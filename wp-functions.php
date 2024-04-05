@@ -30,95 +30,15 @@ add_action( 'wp_enqueue_scripts', function() {
 	}
 } );
 
-# ========================================================
-# = Query
-# ========================================================
- // function sc_get_posts( $category_slug, $tag_slug, $post_type ) {
- function sc_get_posts( $post_type ) {
-    $args = array(
-        'post_type' => $post_type,
-        'posts_per_page' => -1,
-        /*
-        'tax_query' => array(
-            'relation' => 'AND',
-            array(
-                'taxonomy' => 'category',
-                'field'    => 'slug',
-                'terms'    => $category_slug,
-            ),
-            array(
-                'taxonomy' => 'post_tag',
-                'field'    => 'slug',
-                'terms'    => $tag_slug,
-            ),
-        ),
-        */
-    );
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        return $query;
-    } else {
-        return false;
-    }
-}
-
-
-
-function sc_get_post_terms( $post_id, $tax ) {
-    $term_list = wp_get_post_terms($post_id, $tax);
-    $out_list = '';
-
-    if (!empty($term_list) && !is_wp_error($term_list)) {
-        foreach ($term_list as $term) {
-            $out_lis .= "<li>$term->name </li>";
-        }
-    } 
-
-    return $out_lis;
-}
 
 
 
 
-//repeater conditional untested - it was removed on CSSN
 
- function output_acf_fields_with_labels($post_id = null) {
-  if (!$post_id) $post_id = get_the_ID();
-  $output = '';
-  $fields = get_fields($post_id);
-  foreach ($fields as $field_name => $field_value) {
-      $field_object = get_field_object($field_name, $post_id);
-      if (empty($field_value)) continue; // Skip empty fields
-      if ($field_object['type'] === 'repeater') {
-          $output .= '<h3>' . $field_object['label'] . '</h3>';
-          foreach ($field_value as $row_index => $row) {
-              $output .= '<div class="acf-field">';
-              $output .= '<h4>' . $field_object['label'] . '</h4>';
-              foreach ($row as $subfield_name => $subfield_value) {
-                  $subfield_object = get_field_object($subfield_name, $post_id);
-                  if (empty($subfield_value)) continue; // Skip empty subfields
-                  if (is_array($subfield_value)) {
-                      $subfield_value = implode(', ', $subfield_value);
-                  }
-                  $output .= '<div class="acf-subfield">';
-                  $output .= '<strong>' . $subfield_object['label'] . ':</strong> ' . $subfield_value;
-                  $output .= '</div>';
-              }
-              $output .= '</div>';
-          }
-      } else {
-          if (is_array($field_value)) {
-              $field_value = implode(', ', $field_value);
-          }
-          $output .= '<div class="acf-field ' . $field_object['name'] . '">';
-          $output .= '<h4>' . $field_object['label'] . '</h4>';
-          $output .= '<div class="acf-value">' . $field_value . '</div>';
-          $output .= '</div>';
-      }
-  }
-  return $output;
-}
+
+require_once('_functions-post.php');
+
+
 
 
 # ========================================================
